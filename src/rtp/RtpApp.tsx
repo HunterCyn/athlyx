@@ -429,6 +429,69 @@ function Trial(props: {
   );
 }
 
+/* ------------------------------- coach read ------------------------------- */
+
+/** One paragraph from the measured numbers. The key stays on the server; this
+ *  only ever posts the numbers, never video or an image. */
+function AiRead(props: {
+  index: number;
+  left: number;
+  right: number;
+  kneeSep: number;
+  trunk: number;
+  pelvic: number;
+  lowImpact: boolean;
+  involved: Involved;
+}) {
+  const [ai, setAi] = useState<{ state: 'idle' | 'loading' | 'ok' | 'off'; text: string }>({
+    state: 'idle',
+    text: '',
+  });
+
+  const ask = async () => {
+    setAi({ state: 'loading', text: '' });
+    try {
+      const res = await fetch('/api/summary', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(props),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      if (!data?.summary) throw new Error('empty');
+      setAi({ state: 'ok', text: String(data.summary) });
+    } catch {
+      setAi({ state: 'off', text: '' });
+    }
+  };
+
+  return (
+    <div className="r-ai">
+      <div className="r-kicker">COACH READ · GEMINI</div>
+      {ai.state === 'idle' ? (
+        <>
+          <p className="r-body">One paragraph in plain English, written from the numbers above.</p>
+          <button className="r-btn ghost" onClick={ask}>
+            EXPLAIN THIS TO ME
+          </button>
+        </>
+      ) : null}
+      {ai.state === 'loading' ? <p className="r-body">Reading your numbers…</p> : null}
+      {ai.state === 'ok' ? <p className="r-body">{ai.text}</p> : null}
+      {ai.state === 'off' ? (
+        <p className="r-body">
+          The written summary isn’t available right now. The numbers above are the whole result, and they’re what a
+          physiotherapist will want to see.
+        </p>
+      ) : null}
+      <p className="r-fine">
+        Only the numbers above are sent — never video, never a photo. Gemini writes the paragraph; it does not change a
+        single measurement.
+      </p>
+    </div>
+  );
+}
+
 /* --------------------------------- report --------------------------------- */
 
 function Report(props: {
@@ -554,6 +617,17 @@ function Report(props: {
             ))}
           </div>
         </div>
+
+        <AiRead
+          index={index}
+          left={agg.leftValgus}
+          right={agg.rightValgus}
+          kneeSep={agg.kneeSep}
+          trunk={agg.trunk}
+          pelvic={agg.pelvic}
+          lowImpact={lowImpact}
+          involved={involved}
+        />
 
         <div className="r-actions wide">
           <button className="r-btn primary" onClick={onAgain}>
