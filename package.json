@@ -1,9 +1,9 @@
 {
-  "name": "pivot",
+  "name": "athlyx",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "PIVOT — the landing screen for return to sport. Measures knee collapse, landing symmetry and trunk control from one phone camera.",
+  "description": "ATHLYX — the landing screen for return to sport. Measures knee collapse, landing symmetry and trunk control from one phone camera.",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
     "build": "tsc --noEmit && vite build && rm -rf dist/mediapipe",

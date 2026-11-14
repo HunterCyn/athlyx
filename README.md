@@ -1,10 +1,10 @@
-# PIVOT
+# ATHLYX
 
 **The landing screen for return to sport.**
 
 Twenty to forty percent of athletes retear an ACL after they have passed the return-to-sport tests. Those tests measure how far you hop, not how you land — so a knee that folds inward on every landing can pass cleanly and then tear again.
 
-PIVOT watches you land. Prop a phone at hip height, drop off a box, and it reads 33 body landmarks on-device and measures how far each knee collapses toward the midline, how close your knees stay, how far your trunk tips and whether one hip drops. Three trials, a symmetry index against the 90% reference, and a report you can take to a physiotherapist.
+ATHLYX watches you land. Prop a phone at hip height, drop off a box, and it reads 33 body landmarks on-device and measures how far each knee collapses toward the midline, how close your knees stay, how far your trunk tips and whether one hip drops. Three trials, a symmetry index against the 90% reference, and a report you can take to a physiotherapist.
 
 **Live:** https://site-2773a397b7f34300a1be984c4e3c13dd.freebuff.page
 
@@ -92,7 +92,7 @@ src/lib/body.ts       33 landmarks → torso-normalised body frame
 
 ## The rest of the repo
 
-- `/yoga` — **STILL**, the camera yoga coach this pivoted from: four poses, per-person calibration, spoken cues. `src/yoga/`.
+- `/yoga` — the camera yoga coach the project began as: four poses, per-person calibration, spoken cues. `src/yoga/`.
 - `/arcade` — **GHOSTMOVE**, the original pose arcade. `src/App.tsx`.
 
 ## Status

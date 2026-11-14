@@ -41,7 +41,7 @@ export function Home({ db, onStart, onDemo, onPose }: Props) {
   return (
     <div className="y-screen y-home">
       <header className="y-top">
-        <span className="y-wordmark">STILL</span>
+        <span className="y-wordmark">ATHLYX</span>
         <span className="y-tag">PHONE YOGA COACH</span>
       </header>
 

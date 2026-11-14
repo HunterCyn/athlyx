@@ -96,7 +96,7 @@ export function Setup({ engine, baseline, onReady, onDemo, onBack }: Props) {
   return (
     <div className="y-screen y-setup">
       <header className="y-top">
-        <span className="y-wordmark">STILL</span>
+        <span className="y-wordmark">ATHLYX</span>
         <span className="y-tag">{ready ? 'BODY CALIBRATED' : 'SET UP YOUR MAT'}</span>
         <button className="y-icon" onClick={onBack} aria-label="Back">
           ✕

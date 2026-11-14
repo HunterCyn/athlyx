@@ -26,7 +26,7 @@ export function Summary({ results, onAgain, onHome }: Props) {
   return (
     <div className="y-screen y-summary">
       <header className="y-top">
-        <span className="y-wordmark">STILL</span>
+        <span className="y-wordmark">ATHLYX</span>
         <span className="y-tag">SESSION COMPLETE</span>
         <span />
       </header>

@@ -220,7 +220,7 @@ export function Practice({ engine, poses, baseline, demo, onDone, onExit }: Prop
   return (
     <div className="y-screen y-practice">
       <header className="y-top">
-        <span className="y-wordmark">STILL</span>
+        <span className="y-wordmark">ATHLYX</span>
         <div className="y-progress">
           {poses.map((it, i) => (
             <i key={it.id} className={i < live.poseIndex ? 'done' : i === live.poseIndex ? 'now' : ''} />

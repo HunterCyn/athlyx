@@ -1,9 +1,9 @@
-# PIVOT — context for agents
+# ATHLYX — context for agents
 
 Three apps, one repo, one pose engine:
 
-- `/` and `/rtp` → **PIVOT**, the return-to-play landing screen. `src/rtp/`, entry `src/rtp/main.tsx`. Both `index.html` and `rtp.html` mount it; keep both so old `/rtp` links survive.
-- `/yoga` → **STILL**, the camera yoga coach the project pivoted from. `src/yoga/`, entry `src/main.tsx`, page `yoga.html`.
+- `/` and `/rtp` → **ATHLYX**, the return-to-play landing screen. `src/rtp/`, entry `src/rtp/main.tsx`. Both `index.html` and `rtp.html` mount it; keep both so old `/rtp` links survive.
+- `/yoga` → the camera yoga coach the project began as. `src/yoga/`, entry `src/main.tsx`, page `yoga.html`.
 - `/arcade` → **GHOSTMOVE**, the original pose arcade. `src/App.tsx`, entry `src/arcade.tsx`, page `arcade.html`.
 
 Shared engine in `src/lib/`: `vision.ts` (MediaPipe `PoseLandmarker`, local WASM in dev, jsDelivr in prod), `body.ts` (33 landmarks → torso-normalised `Skeleton` / `BodyPose`), `audio.ts`, `render.ts`.
@@ -13,10 +13,10 @@ Shared engine in `src/lib/`: `vision.ts` (MediaPipe `PoseLandmarker`, local WASM
 - `npm run dev` — Vite on `:3000`, bound to `0.0.0.0`.
 - `npm run build` — `tsc --noEmit && vite build && rm -rf dist/mediapipe`. All four HTML entries are built.
 - There is no test runner. Two harnesses have been used and must be rebuilt before changing the maths:
-  - **PIVOT:** bundle `src/rtp/metrics.ts` + `Athlete.ts` with esbuild and assert planted knee angles come back within 0.5°, a symmetric landing scores 100, standing is rejected, and the median ignores an outlier. The report screen also runs this live.
-  - **STILL:** bundle `src/yoga/poses.ts` + `checks.ts` and assert reference sketches score ~100 %, mirrored ~100 %.
+  - **ATHLYX:** bundle `src/rtp/metrics.ts` + `Athlete.ts` with esbuild and assert planted knee angles come back within 0.5°, a symmetric landing scores 100, standing is rejected, and the median ignores an outlier. The report screen also runs this live.
+  - **Yoga:** bundle `src/yoga/poses.ts` + `checks.ts` and assert reference sketches score ~100 %, mirrored ~100 %.
 
-## PIVOT — the primary product
+## ATHLYX — the primary product
 
 - `src/rtp/metrics.ts` — `kneeValgus` (signed frontal-plane angle from the knee's offset to the hip→ankle line), `kneeSeparation`, `trunkLean`, `pelvicDrop`, `legExtension`, `detectLanding`, `symmetry`, `combineTrials`, `verdict`.
 - `src/rtp/Athlete.ts` — synthetic drop landing with a **planted** valgus angle per leg (`bodyAt`, `syntheticFrames`, `selfTest`). Demo body and test rig in one.
@@ -32,7 +32,7 @@ Shared engine in `src/lib/`: `vision.ts` (MediaPipe `PoseLandmarker`, local WASM
 - **The safety gate is not optional and not a modal.** Pregnancy, recent surgery, current pain/instability, heart conditions and clinical advice against impact work route to a low-impact step-down. Consent gates the start button.
 - 2D frontal-plane measures are validated for **landing**, not for the single-leg squat. Do not "improve" the screen by swapping the task.
 
-## STILL — the yoga prototype
+## The yoga prototype
 
 - Every check is an anatomical measurement, normalised by torso length and a calibrated baseline. **Do not** score yoga by position-matching (`scoreShape` in `lib/body.ts`) — it hides hip tilt and collapsed knees and punishes longer femurs.
 - Reference sketches must score ≥ 97 % against their own checks and ≥ 95 % mirrored.
@@ -51,4 +51,4 @@ Site `9f3a6c2e-8b41-4d7a-9e15-6c4b2f8a1d07`, production `https://site-2773a397b7
 
 ## Not verified
 
-There is no webcam in the dev VM. The camera path, calibration from a real body and live tracking are untested for **both** apps; only the synthetic path and the maths are. Do not describe PIVOT as validated with athletes.
+There is no webcam in the dev VM. The camera path, calibration from a real body and live tracking are untested for **both** apps; only the synthetic path and the maths are. Do not describe ATHLYX as validated with athletes.
