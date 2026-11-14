@@ -37,6 +37,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .r-mark {
@@ -50,6 +51,17 @@
   font: 600 9px/1 var(--y-sans);
   letter-spacing: 0.3em;
   color: var(--y-dim);
+  min-width: 0;
+  white-space: normal;
+  text-align: right;
+}
+
+@media (max-width: 620px) {
+  .r-tag {
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    line-height: 1.4;
+  }
 }
 
 .r-icon {
