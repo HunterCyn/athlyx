@@ -1,0 +1,19 @@
+node_modules
+dist
+dist-ssr
+
+# secrets — never commit
+.env
+.env.*
+!.env.example
+
+# local + tooling
+*.local
+*.log
+dev.log
+*.tsbuildinfo
+.vite
+coverage
+.tmp-*
+.freebuff
+.DS_Store

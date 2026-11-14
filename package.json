@@ -1,0 +1,24 @@
+{
+  "name": "ghostmove",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Camera-AI pose arcade. Your body is the controller. Your best run becomes a ghost.",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 3000",
+    "build": "tsc --noEmit && vite build && rm -rf dist/mediapipe",
+    "preview": "vite preview --host 0.0.0.0 --port 4173"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^1.2.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.9.0",
+    "vite": "^7.0.0"
+  }
+}
