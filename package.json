@@ -1,9 +1,9 @@
 {
-  "name": "still-yoga-coach",
+  "name": "pivot",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Camera-AI yoga coach. Your phone watches 33 joints and tells you the one thing to fix.",
+  "description": "PIVOT — the landing screen for return to sport. Measures knee collapse, landing symmetry and trunk control from one phone camera.",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3000",
     "build": "tsc --noEmit && vite build && rm -rf dist/mediapipe",

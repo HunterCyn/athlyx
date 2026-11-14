@@ -79,7 +79,7 @@ function Gate(props: {
   return (
     <section className="r-screen">
       <header className="r-top">
-        <span className="r-mark">STILL</span>
+        <span className="r-mark">PIVOT</span>
         <span className="r-tag">RETURN-TO-PLAY · LANDING SCREEN</span>
       </header>
 
@@ -183,7 +183,7 @@ function Setup(props: { engine: PoseEngine; onBegin: () => void; onDemo: () => v
   return (
     <section className="r-screen">
       <header className="r-top">
-        <span className="r-mark">STILL</span>
+        <span className="r-mark">PIVOT</span>
         <span className="r-tag">SET UP THE FLOOR</span>
         <button className="r-icon" onClick={onBack} aria-label="Back">
           ✕
@@ -342,7 +342,7 @@ function Trial(props: {
   return (
     <section className="r-screen">
       <header className="r-top">
-        <span className="r-mark">STILL</span>
+        <span className="r-mark">PIVOT</span>
         <span className="r-tag">
           TRIAL {trialNo + 1} OF {TRIALS}
         </span>
@@ -458,7 +458,7 @@ function Report(props: {
   return (
     <section className="r-screen">
       <header className="r-top">
-        <span className="r-mark">STILL</span>
+        <span className="r-mark">PIVOT</span>
         <span className="r-tag">LANDING REPORT · {lowImpact ? 'LOW IMPACT' : 'DROP LANDING'}</span>
       </header>
 

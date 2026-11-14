@@ -11,8 +11,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        arcade: 'arcade.html',
         rtp: 'rtp.html',
+        yoga: 'yoga.html',
+        arcade: 'arcade.html',
       },
     },
   },

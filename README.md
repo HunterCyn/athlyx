@@ -1,100 +1,104 @@
-# STILL
+# PIVOT
 
-**Your phone is the yoga instructor.**
+**The landing screen for return to sport.**
 
-Every yoga app is a video. You copy it badly, and nothing tells you that your front knee is over your toes or your back leg has collapsed. STILL uses the camera you already have: prop the phone two metres away, and it reads 33 body joints on-device and tells you the one thing to fix — out loud, because at two metres you cannot read a screen.
+Twenty to forty percent of athletes retear an ACL after they have passed the return-to-sport tests. Those tests measure how far you hop, not how you land — so a knee that folds inward on every landing can pass cleanly and then tear again.
 
-**Live:** https://site-2773a397b7f34300a1be984c4e3c13dd.freebuff.page — open on a phone, allow the camera, stand in Mountain while it calibrates.
+PIVOT watches you land. Prop a phone at hip height, drop off a box, and it reads 33 body landmarks on-device and measures how far each knee collapses toward the midline, how close your knees stay, how far your trunk tips and whether one hip drops. Three trials, a symmetry index against the 90% reference, and a report you can take to a physiotherapist.
+
+**Live:** https://site-2773a397b7f34300a1be984c4e3c13dd.freebuff.page
 
 ```bash
 npm install
 npm run dev      # http://localhost:3000
 ```
 
-Requires Node 20+. The pose model (~5.6 MB) and the MediaPipe WASM runtime are bundled in `public/`, so `npm run dev` works with the venue wifi switched off. Camera access needs `localhost` or HTTPS.
+Requires Node 20+. The pose model (~5.6 MB) and the MediaPipe WASM runtime are bundled in `public/`, so `npm run dev` works with the venue wifi off. Camera access needs `localhost` or HTTPS.
 
 > The hosted build serves the model from its own origin but pulls the 28 MB WASM runtime from jsDelivr to stay under the static-upload cap. For a fully offline demo, run it locally.
 
 ---
 
-## The four poses
+## The screen
 
-| Pose | Hold | What is actually measured |
+**1. Safety gate.** Five conditions — pregnancy or birth within six weeks, knee or hip surgery in the last three months (or no surgeon clearance), current pain/swelling/instability, heart conditions or dizziness on exertion, a clinician's advice against impact work. Tick any one and it will not run an impact test; it routes to a low-impact step-down instead. Consent is required before the start button enables.
+
+**2. Setup.** Phone at hip height, 2–3 m back, head to feet in frame.
+
+**3. Three trials.** A countdown, a 3.4 s capture, a bilateral drop landing. It reports both knees after every trial, so a bad rep is obvious before you commit it.
+
+**4. Report.** Per-leg peak knee angle, knee separation, trunk lean, pelvic drop, the symmetry index against the 90% clinical reference, a trend across sessions, and the pipeline self-test. Printable.
+
+---
+
+## What is measured
+
+| Metric | What it is | Why |
 | --- | --- | --- |
-| **Mountain** (Tadasana) | 16 s | Torso vertical, both legs straight, feet hip-width, shoulders level, arms hanging, head over hips |
-| **Warrior I** (Virabhadrasana I) | 22 s | Front knee ≈90°, knee stacked over the ankle, back leg straight, wide stance, both hands above the head and over the shoulders, torso upright |
-| **Warrior II** (Virabhadrasana II) | 22 s | Same legs, plus arms level with the shoulders and extended wide, hips level |
-| **Extended Side Angle** (Utthita Parsvakonasana) | 24 s | Same legs, plus a side bend over the **front** leg, bottom hand toward the floor, top arm reaching long |
-
----
-
-## How it judges you
-
-Not by matching your joints to a reference skeleton. That hides a hip tilt or a collapsed knee inside the tolerance, and it punishes anyone whose femurs are longer than the reference figure's.
-
-Instead, every check is an **anatomical measurement**: joint angles, knee-over-ankle stacking, stance width, shoulder and hip levelness, torso lean, arm position, side bend. Each one is normalised by torso length (so it is scale invariant) and by a baseline learned from *you*.
-
-- **Calibration.** Before the flow, you stand in Mountain for ~2.5 seconds. It records your shoulder tilt, hip tilt, natural lean, natural stance width and arm drop. A 5′2″ and a 6′4″ practitioner then get judged on the same scale.
-- **Scoring.** Each check maps its error through a tolerance window into 0–1. The alignment percentage is a weighted mean; leg and stacking checks weigh more than head position.
-- **Cues.** The worst failing check becomes the one spoken line. It only speaks once a correction has been true for a second, and repeats at most every 7 s — it coaches instead of chattering.
-- **Hold.** The timer advances only while alignment is ≥ 66 %, so a sloppy shape doesn't earn the pose.
-
----
+| **Peak knee angle** | Per leg: how far the knee sits toward the midline of the hip→ankle line at maximum compression, in degrees | Frontal-plane knee collapse is the visible risk posture |
+| **Knee separation** | Knee-to-knee distance ÷ ankle-to-ankle distance | Knees collapsing together reads below ~0.6 |
+| **Trunk lean** | Torso away from vertical at peak | Compensation pattern above the knee |
+| **Pelvic drop** | One hip lower than the other at peak | Hip control on the landing side |
+| **Symmetry index** | Smaller magnitude ÷ larger, as a percentage, on the knee angle | The 90% line clinicians use, on our own measure |
 
 ## What it deliberately does not measure
 
-One camera cannot see depth. So the lunges are judged **face-on with a wide stance**, and the app does not claim to score a true heel-to-heel Warrior stance, chest rotation, or how far the knee travels forward. It measures angle, stacking, symmetry and levelness — what one lens can honestly see — and stays quiet about the rest.
+**It is not the Limb Symmetry Index.** The clinical LSI comes from hop distance or jump height; a single camera does not measure either, so the number here is a frontal-plane symmetry index and the report says so.
 
-It is also not a medical device and gives no injury advice.
+**It is not a force measurement.** Ground reaction forces need plates. We measure joint geometry and call it geometry.
 
----
+**It is not a diagnosis.** It is a screen. Pain, instability and a recent reconstruction are a conversation with a clinician.
 
-## Any body, any camera
-
-Two things make the same code work for different people and different setups:
-
-1. **The torso-normalised body frame.** Hip centre → shoulder centre is 1 unit, so joint positions are comparable across heights and distances from the camera.
-2. **Per-person calibration**, described above. The checks adjust to *your* natural asymmetry rather than assuming a perfectly level person.
-
-The reference silhouette is drawn at your hip position and torso scale, and the canvas uses object-fit **cover** mapping so the overlay lands exactly on your body in the video.
+**Depth.** One camera cannot see the sagittal plane head-on, so sagittal knee flexion needs a second, side-on view — that is the next addition, not a claim.
 
 ---
 
-## Demo without a camera
+## How the measurement works
 
-`SEE A DEMO BODY` runs a synthetic practitioner. It starts with its arms in a position that is wrong for every pose, waits a beat so the correction is readable, then settles — which shows the coaching working on a laptop with no webcam.
+- **Torso frame.** Hip centre → shoulder centre = 1 unit, so height and distance from the camera drop out of every number (`src/lib/body.ts`).
+- **Landing detection.** Track ankle height below the hip over the capture. The deepest compression is the peak; walking backwards to the last frame with long legs gives contact. Under 7% compression is not a landing and scores nothing (`src/rtp/metrics.ts`).
+- **Knee angle.** Perpendicular offset of the knee from the hip→ankle line, converted into the angle it subtends over half the leg. That is the 2D frontal-plane projection computed from landmarks rather than by eye.
+- **Trials.** The median of three trials per leg, so one bad rep cannot move the result.
 
----
+Why landing and not the single-leg squat: 2D frontal-plane angles agree well with 3D motion capture during **landing**, but barely correlate during a single-leg squat. The task was chosen to match the evidence.
 
-## Not verified
+## The synthetic athlete
 
-There is no webcam in the development VM. The scoring maths, the synthetic demo path and the UI are tested; **the real-camera path — calibration from a live body and per-pose tracking — is not.** That is the first thing to try on a phone.
+`src/rtp/Athlete.ts` performs a drop landing and can be given a known valgus angle per leg. It does two jobs: it is the demo body when there is no camera, and it is the test rig.
+
+The pipeline is checked by planting a knee angle and asserting the same detection and measurement code recovers it:
+
+```
+planted  4°  measured  3.9°   Δ 0.1°
+planted  8°  measured  7.8°   Δ 0.2°
+planted 12°  measured 11.7°   Δ 0.3°
+planted 18°  measured 17.5°   Δ 0.5°
+```
+
+A symmetric landing scores exactly 100, standing still is rejected as "not a landing", and the median ignores an outlier trial. The report screen runs this check live, so the claim is reproducible rather than asserted.
 
 ---
 
 ## Project layout
 
 ```
-src/yoga/checks.ts    anatomical checks, baseline calibration, weighted scoring
-src/yoga/poses.ts     reference sketches in torso units + per-pose check lists
-src/yoga/Practice.tsx live screen: scoring loop, hold timer, cues, checklist
-src/yoga/Setup.tsx    camera framing + 2.5 s calibration
-src/yoga/render.ts    canvas overlay: silhouette, spine guide, hold ring, particles
-src/yoga/voice.ts     spoken cues via speechSynthesis (no key, no network)
-src/yoga/Yogi.ts      synthetic practitioner for camera-less demos
-src/yoga/store.ts     baseline, sessions and bests in localStorage
-src/lib/vision.ts     MediaPipe Pose Landmarker wrapper (GPU → CPU fallback)
+src/rtp/metrics.ts    frontal-plane geometry, landing detection, symmetry, verdicts
+src/rtp/Athlete.ts    synthetic drop landing + the planted-angle self-test
+src/rtp/RtpApp.tsx    gate → setup → three trials → report
+src/rtp/store.ts      sessions in localStorage (key rtp.v1)
+src/lib/vision.ts     MediaPipe Pose Landmarker (GPU → CPU fallback)
 src/lib/body.ts       33 landmarks → torso-normalised body frame
 ```
 
-`AGENTS.md` holds the decision log and the traps — read it before changing the scoring.
+## The rest of the repo
+
+- `/yoga` — **STILL**, the camera yoga coach this pivoted from: four poses, per-person calibration, spoken cues. `src/yoga/`.
+- `/arcade` — **GHOSTMOVE**, the original pose arcade. `src/App.tsx`.
+
+## Status
+
+`tsc --noEmit` and the production build pass. The geometry, landing detection and self-test are verified against synthetic landings. **The camera path has not been tested against a real body** — there is no webcam in the development environment — so the first real task is a phone test, then validation against a physiotherapist's goniometer.
 
 ---
 
-## The arcade
-
-`/arcade.html` is **GHOSTMOVE**, the camera pose arcade this grew out of: strike poses against the clock and race the ghost of whoever scored highest. It shares the pose engine and is kept as a second page, not deleted.
-
----
-
-Built for a camera-AI hackathon. MediaPipe Pose · React · Canvas2D · WebAudio · Vite · zero cloud.
+Built with MediaPipe Pose · React · TypeScript · Vite · Canvas2D. No install, no account, no upload.
