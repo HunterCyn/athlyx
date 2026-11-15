@@ -1,0 +1,358 @@
+/* ============ ATHLYX — landing page ============ */
+
+.lx {
+  --bg: #080d17;
+  --panel: #101827;
+  --panel-2: #0c1522;
+  --ink: #f2f6fb;
+  --muted: #9aa8bd;
+  --mint: #3ee0b5;
+  --mint-ink: #04231c;
+  --line: rgba(255, 255, 255, 0.09);
+  min-height: 100vh;
+  background:
+    radial-gradient(900px 500px at 12% -8%, rgba(62, 224, 181, 0.11), transparent 60%),
+    radial-gradient(700px 420px at 92% 4%, rgba(120, 110, 255, 0.13), transparent 62%),
+    var(--bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.lx * {
+  box-sizing: border-box;
+}
+
+.lx-wrap {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 22px;
+}
+
+/* header */
+.lx-head {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(8, 13, 23, 0.82);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+
+.lx-head-in {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 12px 22px;
+}
+
+.lx-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.lx-mark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: linear-gradient(145deg, #6ff0cd, #8f7bff 70%);
+  color: #052c24;
+  font: 800 14px/1 var(--y-sans, system-ui);
+  letter-spacing: 0.02em;
+}
+
+.lx-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.lx-brand-text b {
+  font-size: 0.95rem;
+  letter-spacing: 0.16em;
+}
+
+.lx-brand-text em {
+  font-style: normal;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lx-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.85rem;
+}
+
+.lx-nav a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.lx-nav > a:not(.lx-btn) {
+  color: var(--muted);
+}
+
+.lx-nav > a:not(.lx-btn):hover {
+  color: var(--ink);
+}
+
+/* buttons */
+.lx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 20px;
+  border-radius: 13px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.lx-btn--mint {
+  background: var(--mint);
+  color: var(--mint-ink);
+}
+
+.lx-btn--mint:hover {
+  background: #55eec5;
+}
+
+.lx-btn--ghost {
+  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--ink);
+}
+
+.lx-btn--ghost:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* hero */
+.lx-hero {
+  padding: clamp(46px, 8vw, 86px) 0 clamp(30px, 5vw, 48px);
+}
+
+.lx-kicker {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 22px;
+}
+
+.lx h1 {
+  margin: 0;
+  font-size: clamp(2.1rem, 6.4vw, 3.6rem);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  font-weight: 800;
+}
+
+.lx-lede {
+  margin: 22px 0 0;
+  font-size: 1.03rem;
+  line-height: 1.68;
+  color: #c3cee0;
+  max-width: 62ch;
+}
+
+.lx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.lx-note {
+  margin: 18px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* sections */
+.lx-section {
+  display: grid;
+  gap: 20px;
+  padding-bottom: 60px;
+}
+
+.lx-card {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, var(--panel), var(--panel-2));
+  border-radius: 18px;
+  padding: 24px 22px;
+}
+
+.lx-card h2 {
+  margin: 0 0 18px;
+  font-size: 1.16rem;
+  letter-spacing: -0.01em;
+}
+
+.lx-card h3 {
+  margin: 0 0 10px;
+  font-size: 1rem;
+}
+
+.lx-body {
+  margin: 0 0 16px;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #c3cee0;
+}
+
+.lx-fine {
+  margin: 16px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* table */
+.lx-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.lx-table th {
+  text-align: left;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 0 12px;
+  font-weight: 700;
+}
+
+.lx-table td {
+  padding: 13px 0;
+  border-top: 1px solid var(--line);
+}
+
+.lx-table th:first-child,
+.lx-table td:first-child {
+  width: 46%;
+}
+
+.lx-mute {
+  color: var(--muted);
+}
+
+/* callout */
+.lx-callout {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: 3px solid var(--mint);
+  border-radius: 14px;
+  padding: 20px 22px;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: #c3cee0;
+  background: rgba(62, 224, 181, 0.05);
+}
+
+.lx-callout b {
+  color: var(--ink);
+}
+
+/* step cards */
+.lx-cards {
+  display: grid;
+  gap: 16px;
+}
+
+.lx-step {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.lx-step p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.62;
+  color: #b9c5d8;
+}
+
+.lx-chip {
+  justify-self: start;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #cfd9e8;
+}
+
+/* lists */
+.lx-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lx-rows li {
+  padding: 13px 0;
+  border-top: 1px solid var(--line);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #c3cee0;
+}
+
+.lx-rows li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.lx-rows--plain {
+  counter-reset: none;
+}
+
+/* footer */
+.lx-foot {
+  border-top: 1px solid var(--line);
+  padding: 26px 0 40px;
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.lx-foot b {
+  color: #cfd9e8;
+}
+
+@media (min-width: 720px) {
+  .lx-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .lx-nav > a:not(.lx-btn) {
+    display: none;
+  }
+  .lx-btn {
+    padding: 11px 16px;
+    font-size: 0.84rem;
+  }
+  .lx-brand-text em {
+    display: none;
+  }
+}
