@@ -34,7 +34,7 @@ Requires Node 20+. The pose model is bundled in `public/`, so `npm run dev` work
 `/app` is the account page. Two roles sign in at the same place:
 
 - **Athletes** run the check-in, see the next date their physiotherapist set, work through the plan that was sent to them, tick exercises off, and keep a history of saved scores.
-- **Physiotherapists** link an athlete with the six-character code from the athlete's home screen, set how often the next check-in should happen and leave a note, build a plan from the shared exercise library (or add their own exercise), and read the saved check-ins — score, both knee angles, status and date.
+- **Physiotherapists** link an athlete with the six-character code from the athlete's home screen, set how often the next check-in should happen and leave a note, build a plan from the shared exercise library — step-down (low step), single-leg balance and lateral band walk — or add their own exercise, and read the saved check-ins: score, both knee angles, status and date.
 
 Demo accounts, already linked and holding two check-ins and a three-exercise plan:
 

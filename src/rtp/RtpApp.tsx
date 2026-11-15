@@ -265,8 +265,10 @@ function Trial(props: {
   const { engine, athlete, demo, lowImpact, trialNo, onDone, onRetry, onQuit } = props;
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [count, setCount] = useState(3);
+  const [count, setCount] = useState(0);
   const [cap, setCap] = useState(0);
+  const [stage, setStage] = useState<'wait' | 'count' | 'cap' | 'done'>('wait');
+  const [inFrame, setInFrame] = useState(false);
   const [result, setResult] = useState<TrialMetrics | null>(null);
   const [missed, setMissed] = useState(false);
 
@@ -281,9 +283,11 @@ function Trial(props: {
     let last = performance.now();
     let elapsed = 0;
     let capT = 0;
-    let stage: 'count' | 'cap' | 'done' = 'count';
+    let ready = 0;
+    let stage: 'wait' | 'count' | 'cap' | 'done' = 'wait';
     let shown = 3;
     let lastPct = -1;
+    let seen: boolean | null = null;
     const frames: Frame[] = [];
 
     const tick = (now: number) => {
@@ -292,17 +296,38 @@ function Trial(props: {
       last = now;
       if (demo) athlete.tick(dt, engine.aspect || 16 / 9);
       const pose = (demo ? athlete : engine).pose;
+      const visible = Boolean(pose?.ok);
+      if (visible !== seen) {
+        seen = visible;
+        setInFrame(visible);
+      }
 
-      if (stage === 'count') {
-        elapsed += dt;
-        const n = Math.max(1, 3 - Math.floor(elapsed));
-        if (n !== shown) {
-          shown = n;
-          setCount(n);
+      if (stage === 'wait') {
+        // There is no button to press 2–3 m from the phone: the countdown arms
+        // itself as soon as the whole body is tracked, and only then.
+        ready = visible ? ready + dt : 0;
+        if (ready >= 0.5) {
+          stage = 'count';
+          elapsed = 0;
+          shown = 3;
+          setStage('count');
+          setCount(3);
         }
-        if (elapsed >= 3) {
-          stage = 'cap';
-          setCount(0);
+      } else if (stage === 'count') {
+        // Held, not skipped, if the athlete steps out of frame mid-countdown.
+        if (visible) {
+          elapsed += dt;
+          const n = Math.max(1, 3 - Math.floor(elapsed));
+          if (n !== shown) {
+            shown = n;
+            setCount(n);
+          }
+          if (elapsed >= 3) {
+            stage = 'cap';
+            capT = 0;
+            setCount(0);
+            setStage('cap');
+          }
         }
       } else if (stage === 'cap') {
         capT += dt;
@@ -315,6 +340,7 @@ function Trial(props: {
         if (capT >= CAPTURE_SECONDS) {
           stage = 'done';
           setCap(100);
+          setStage('done');
           const land = detectLanding(frames);
           if (land) setResult(measureTrial(frames, land));
           else setMissed(true);
@@ -328,7 +354,9 @@ function Trial(props: {
     return () => cancelAnimationFrame(raf);
   }, [athlete, demo, engine]);
 
-  const counting = count > 0 && !result && !missed;
+  const waiting = stage === 'wait' && !result && !missed;
+  const counting = stage === 'count' && !result && !missed;
+  const holding = counting && !inFrame;
 
   return (
     <section className="r-screen">
@@ -348,8 +376,21 @@ function Trial(props: {
           <canvas ref={canvasRef} className="r-canvas" />
           <div className="r-vignette" />
 
-          {counting ? (
-            <div className="r-count">{count}</div>
+          {waiting ? (
+            <div className="r-wait">
+              <b>STEP INTO FRAME</b>
+              <span>head to feet — the 3·2·1 starts on its own</span>
+            </div>
+          ) : counting ? (
+            <>
+              <div className="r-count">{count}</div>
+              {holding ? (
+                <div className="r-wait small">
+                  <b>STAY IN FRAME</b>
+                  <span>countdown held until you are tracked</span>
+                </div>
+              ) : null}
+            </>
           ) : (
             <div className="r-stage-head">
               <b>{cap >= 100 ? 'CAPTURED' : 'LAND NOW'}</b>
@@ -363,7 +404,11 @@ function Trial(props: {
             {lowImpact ? 'LOW-IMPACT STEP-DOWN' : 'BILATERAL DROP LANDING'}
           </div>
           <h2 className="r-h2">
-            {counting ? (
+            {waiting ? (
+              <>
+                Stand where it can <em>see you.</em>
+              </>
+            ) : counting ? (
               <>
                 Get on the <em>step.</em>
               </>
@@ -413,7 +458,12 @@ function Trial(props: {
             </div>
           ) : null}
 
-          {!result && !missed ? <p className="r-fine">Keep your whole body in frame until the trial ends.</p> : null}
+          {!result && !missed ? (
+            <p className="r-fine">
+              Auto-start is on: the countdown begins once the camera has your whole body, and holds if you step out
+              mid-count. Keep the pose skeleton on you until the trial ends.
+            </p>
+          ) : null}
         </aside>
       </div>
     </section>

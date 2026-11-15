@@ -58,12 +58,9 @@ const SCHEMA = [
 ];
 
 const LIBRARY = [
-  ['lib-1', 'Heel slides', 'early', 'Lie on your back, slide the heel toward your bottom, hold 5 seconds, return slowly.', 'Standard post-operative range-of-motion work'],
-  ['lib-2', 'Straight-leg raise', 'early', 'Lie on your back, brace the thigh, lift the straight leg 30 cm, lower over 3 seconds.', 'Quadriceps activation, common post-ACL protocol'],
   ['lib-3', 'Step-down (low step)', 'mid', 'Stand on a 10 cm step, bend the standing knee to tap the other heel down, keep the knee over the toes.', 'Front-view landing mechanics'],
   ['lib-4', 'Single-leg balance', 'mid', 'Stand on the operated leg, hold 30 seconds, keep the knee soft and the hip level.', 'Proprioception after lower-limb surgery'],
   ['lib-5', 'Lateral band walk', 'mid', 'Band above the knees, step sideways keeping tension, 10 steps each way.', 'Glute medius control'],
-  ['lib-6', 'Drop landing to stick', 'late', 'Step off a low box, land on both feet, hold the landing for 3 seconds without letting the knees collapse.', 'Landing mechanics, front view'],
 ];
 
 /* --------------------------------- utils ---------------------------------- */
@@ -465,7 +462,7 @@ async function api(request, env, url) {
   /* ---- exercises ---- */
   if (path === '/api/exercises' && method === 'GET') {
     const rows = await env.DB.prepare(
-      'SELECT * FROM exercises WHERE owner_id IS NULL OR owner_id = ? ORDER BY (owner_id IS NOT NULL), name',
+      "SELECT * FROM exercises WHERE (owner_id IS NULL AND id IN ('lib-3', 'lib-4', 'lib-5')) OR owner_id = ? ORDER BY (owner_id IS NOT NULL), name",
     )
       .bind(user.id)
       .all();

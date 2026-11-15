@@ -24,7 +24,7 @@ The yoga coach and the pose arcade that this project grew out of have been remov
 
 ## Accounts and data
 
-- D1 binding `DB`; tables are created lazily on first request in `ensureSchema`, which also seeds the six-exercise library and one linked demo pair (`athlete@athlyx.demo` / `therapist@athlyx.demo`, password `athlyx-demo`).
+- D1 binding `DB`; tables are created lazily on first request in `ensureSchema`, which also seeds the three-exercise core library (step-down, single-leg balance, lateral band walk; ids `lib-3` to `lib-5`, others filtered out of `/api/exercises`) and one linked demo pair (`athlete@athlyx.demo` / `therapist@athlyx.demo`, password `athlyx-demo`).
 - Passwords: PBKDF2-SHA256, per-user salt, **100 000 iterations — Workers rejects more**, which showed up as a 500 on every route because the demo seed hashes a password during schema setup.
 - Sessions: random token in an HttpOnly `ax_s` cookie, stored in `sessions`, 30 days.
 - Authorisation is checked per route: a therapist may only touch an athlete they are in `links` with (otherwise 403), and every `/api` route except health/signup/login needs a session (otherwise 401). Do not trust an `athleteId` from the body without that check.
