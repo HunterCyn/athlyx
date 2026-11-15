@@ -855,3 +855,14 @@
 .r-ai .r-btn {
   justify-self: start;
 }
+
+/* status labels are phrases now, not single words */
+.r-verdict b {
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+  max-width: 26ch;
+}
+
+.r-verdict {
+  align-items: flex-start;
+}
