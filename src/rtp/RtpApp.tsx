@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { BodyPose } from '../lib/body';
 import { PoseEngine } from '../lib/vision';
-import { drawYoga } from '../yoga/render';
+import { drawLanding } from './overlay';
 import { Athlete, selfTest } from './Athlete';
 import {
   combineTrials,
@@ -52,16 +52,7 @@ function paint(cv: HTMLCanvasElement | null, pose: BodyPose | null, aspect: numb
     cv.height = Math.round(H * dpr);
   }
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  drawYoga(ctx, W, H, {
-    pose,
-    ref: null,
-    camAspect: aspect,
-    score: pose?.ok ? 0.92 : 0,
-    hold: 0,
-    time,
-    celebrate: 0,
-    particles: [],
-  });
+  drawLanding(ctx, W, H, { pose, camAspect: aspect, time });
 }
 
 /* ---------------------------------- gate ---------------------------------- */
@@ -504,7 +495,7 @@ function Report(props: {
   const { trials, involved, sessions, lowImpact, onAgain } = props;
   const agg = useMemo(() => combineTrials(trials), [trials]);
   const index = symmetryIndex(agg);
-  const v = verdict(index);
+  const v = verdict(index, trials.length);
   const checks = useMemo(() => selfTest(), []);
   const trend = sessions.slice(0, 8).reverse();
 

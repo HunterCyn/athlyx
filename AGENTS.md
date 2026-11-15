@@ -1,54 +1,46 @@
 # ATHLYX — context for agents
 
-Three apps, one repo, one pose engine:
+One app, one page, one point: measure how a recovering athlete lands.
 
-- `/` and `/rtp` → **ATHLYX**, the return-to-play landing screen. `src/rtp/`, entry `src/rtp/main.tsx`. Both `index.html` and `rtp.html` mount it; keep both so old `/rtp` links survive.
-- `/yoga` → the camera yoga coach the project began as. `src/yoga/`, entry `src/main.tsx`, page `yoga.html`.
-- `/arcade` → **GHOSTMOVE**, the original pose arcade. `src/App.tsx`, entry `src/arcade.tsx`, page `arcade.html`.
+- `/` and `/rtp` → **ATHLYX**, the landing screen. `src/rtp/`, entry `src/rtp/main.tsx`. Both `index.html` and `rtp.html` mount it so old `/rtp` links keep working.
+- `site/worker.js` → serves `dist/` and hosts `POST /api/summary`, the only route that talks to Gemini.
 
-Shared engine in `src/lib/`: `vision.ts` (MediaPipe `PoseLandmarker`, local WASM in dev, jsDelivr in prod), `body.ts` (33 landmarks → torso-normalised `Skeleton` / `BodyPose`), `audio.ts`, `render.ts`.
+The yoga coach and the pose arcade that this project grew out of have been removed. Do not reintroduce them.
 
 ## Commands
 
 - `npm run dev` — Vite on `:3000`, bound to `0.0.0.0`.
-- `npm run build` — `tsc --noEmit && vite build && rm -rf dist/mediapipe`. All four HTML entries are built.
-- There is no test runner. Two harnesses have been used and must be rebuilt before changing the maths:
-  - **ATHLYX:** bundle `src/rtp/metrics.ts` + `Athlete.ts` with esbuild and assert planted knee angles come back within 0.5°, a symmetric landing scores 100, standing is rejected, and the median ignores an outlier. The report screen also runs this live.
-  - **Yoga:** bundle `src/yoga/poses.ts` + `checks.ts` and assert reference sketches score ~100 %, mirrored ~100 %.
+- `npm run build` — `tsc --noEmit && vite build && rm -rf dist/mediapipe`.
+- No test runner. The measurement pipeline is verified by bundling `src/rtp/metrics.ts` + `Athlete.ts` with esbuild and asserting that planted knee angles come back within 0.5°, that a symmetric landing scores 100, that standing is rejected, and that the median ignores an outlier. The report screen also runs this live. Rebuild the harness before touching `metrics.ts` or `Athlete.ts`.
 
-## ATHLYX — the primary product
+## Where the product logic lives
 
-- `src/rtp/metrics.ts` — `kneeValgus` (signed frontal-plane angle from the knee's offset to the hip→ankle line), `kneeSeparation`, `trunkLean`, `pelvicDrop`, `legExtension`, `detectLanding`, `symmetry`, `combineTrials`, `verdict`.
-- `src/rtp/Athlete.ts` — synthetic drop landing with a **planted** valgus angle per leg (`bodyAt`, `syntheticFrames`, `selfTest`). Demo body and test rig in one.
-- `src/rtp/RtpApp.tsx` — gate → setup → three trials → report.
+- `src/rtp/metrics.ts` — `kneeValgus`, `kneeSeparation`, `trunkLean`, `pelvicDrop`, `legExtension`, `detectLanding`, `symmetry`, `median`, `measureTrial`, `symmetryIndex`, `verdict`, `combineTrials`.
+- `src/rtp/Athlete.ts` — synthetic drop landing with a **planted** valgus angle per leg; demo body and test rig in one.
+- `src/rtp/RtpApp.tsx` — gate → setup → three trials → report, plus the `AiRead` card.
+- `src/rtp/overlay.ts` — skeleton drawing. Must map through **object-fit: cover**, or the skeleton drifts off the body.
 
-### Rules that have already bitten
+## Rules that have already bitten
 
-- **`legExtension` has no negation.** Ankles are *below* the hip, so `(la.y + ra.y) / 2` is already positive. A minus sign there makes every reading negative and no landing is ever detected.
-- **The synthetic neutral knee must sit on the hip→ankle line.** Any lateral offset at fold 0 becomes a systematic bias in every reading. `kneeBase = (0.22 + stance) / 2` is what keeps it exact.
-- **Valgus must scale with compression, not with a separate curve.** A synthetic that peaks its angle before maximum fold measures zero at the frame the detector picks.
-- **Do not call the symmetry number the Limb Symmetry Index.** The clinical LSI is hop distance or jump height. It is a frontal-plane symmetry index; the 90 % line is a reference, not a pass mark.
-- **No force claims.** Landing "shock absorption" is kinematics (knee flexion excursion), never force — that needs plates.
-- **The safety gate is not optional and not a modal.** Pregnancy, recent surgery, current pain/instability, heart conditions and clinical advice against impact work route to a low-impact step-down. Consent gates the start button.
-- 2D frontal-plane measures are validated for **landing**, not for the single-leg squat. Do not "improve" the screen by swapping the task.
-
-## The yoga prototype
-
-- Every check is an anatomical measurement, normalised by torso length and a calibrated baseline. **Do not** score yoga by position-matching (`scoreShape` in `lib/body.ts`) — it hides hip tilt and collapsed knees and punishes longer femurs.
-- Reference sketches must score ≥ 97 % against their own checks and ≥ 95 % mirrored.
-- `sideBend` takes its direction from the front knee's **position**, not the joint name.
-- The face-on stance is deliberate: one camera cannot see heel-to-heel depth.
-- `src/yoga/render.ts` maps through **object-fit: cover**; the overlay must line up pixel-for-pixel with the video.
+- **`legExtension` has no negation.** Ankles are below the hip, so `(la.y + ra.y) / 2` is already positive. A minus sign makes every reading negative and no landing is ever detected.
+- **The synthetic neutral knee must sit on the hip→ankle line** (`kneeBase = (0.22 + stance) / 2`). Any lateral offset at fold 0 becomes a systematic bias.
+- **Valgus must scale with compression**, not with its own curve, or the angle peaks before the frame the detector picks.
+- **Do not call the symmetry number the Limb Symmetry Index.** LSI requires hop distance or jump height. The report says this on the same screen.
+- **No force claims.** Landing "shock absorption" is kinematics; force needs plates.
+- **Status bands are fixed**: ≥90 meets, 85–90 borderline, <85 below, and fewer than three valid trials is insufficient data. Never let a model produce or alter a status.
+- **The safety gate is not a modal and not optional.** Pregnancy, recent surgery, pain, heart conditions and clinical advice against impact work route to a low-impact step-down; consent gates the start.
+- 2D frontal-plane measures are validated for **landing**, not for the single-leg squat. Do not swap the task to look more clinical.
+- The Gemini key lives in the host's secret store. Never put it in the bundle, an env file committed to the repo, or client code.
 
 ## Deploy
 
-`deploy.manifest.json` → Worker serving `env.ASSETS` from `./dist` with SPA fallback. Cloudflare serves `.html` entries at the clean path (`/rtp`, not `/rtp.html`, which 307s).
+`deploy.manifest.json` → Worker serving `env.ASSETS` from `./dist` with SPA fallback, plus `./site/worker.js`.
 Site `9f3a6c2e-8b41-4d7a-9e15-6c4b2f8a1d07`, production `https://site-2773a397b7f34300a1be984c4e3c13dd.freebuff.page`.
 
 - Deploy cap is 10 MiB: `dist/mediapipe` (28 MB of WASM) is deleted after build and prod loads WASM from jsDelivr. `public/` is 35 MB and must not ship.
 - `tsconfig` has no `@types/node`, so `vite.config.ts` must not import `node:fs` or `node:path`.
-- Nothing secret in the bundle.
+- `node_modules` does not survive environment restarts: run `npm ci` before `tsc` or `build`.
 
 ## Not verified
 
-There is no webcam in the dev VM. The camera path, calibration from a real body and live tracking are untested for **both** apps; only the synthetic path and the maths are. Do not describe ATHLYX as validated with athletes.
+There is no webcam in the dev VM. The camera path, calibration from a real body and live tracking are untested; only the synthetic path and the maths are. Do not describe ATHLYX as validated with athletes.

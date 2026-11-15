@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import RtpApp from './RtpApp';
-import '../yoga/yoga.css';
+import './base.css';
 import './rtp.css';
 
 const el = document.getElementById('root');

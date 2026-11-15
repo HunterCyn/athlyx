@@ -12,8 +12,6 @@ export default defineConfig({
       input: {
         main: 'index.html',
         rtp: 'rtp.html',
-        yoga: 'yoga.html',
-        arcade: 'arcade.html',
       },
     },
   },

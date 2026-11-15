@@ -1,8 +1,5 @@
 import { FilesetResolver, PoseLandmarker } from '@mediapipe/tasks-vision';
-import { lerp, restSkeleton, toBody, type BodyPose, type Joint, type RawLm, type Skeleton } from './body';
-import { JOINTS } from './body';
-import { restPose } from './poses';
-import type { Run } from './game';
+import { toBody, type BodyPose, type RawLm } from './body';
 
 const BASE = import.meta.env.BASE_URL || '/';
 
@@ -162,47 +159,4 @@ export class PoseEngine implements PoseSource {
     }
     this.onFrame?.(this.pose, now);
   };
-}
-
-/**
- * A synthetic performer that plays the game by itself. Powers the auto-demo,
- * so the booth never shows a dark stage — and a judge without a webcam still
- * sees the whole loop.
- */
-export class Performer implements PoseSource {
-  pose: BodyPose | null = null;
-  aspect = 16 / 9;
-  status: SourceStatus = 'ready';
-  error = '';
-  private cur: Skeleton = restSkeleton();
-  private goal: Skeleton = restPose();
-  private phase = 0;
-
-  constructor(private run: Run) {
-    this.cur = { ...restPose() };
-    this.goal = { ...restPose() };
-  }
-
-  tick(dt: number, now: number) {
-    const t = this.run.target;
-    if (t) this.goal = t.skel;
-    else this.goal = restPose();
-
-    const speed = 6.4;
-    for (const j of JOINTS) {
-      const c = this.cur[j];
-      const g = this.goal[j];
-      const d = Math.hypot(g.x - c.x, g.y - c.y);
-      const k = Math.min(1, (speed * dt) / Math.max(d, 1e-4));
-      this.cur[j] = { x: lerp(c.x, g.x, k), y: lerp(c.y, g.y, k) };
-    }
-    this.phase += dt;
-    const wobble = (j: Joint, seed: number) => ({
-      x: this.cur[j].x + Math.sin(now * 0.0021 + seed) * 0.008,
-      y: this.cur[j].y + Math.cos(now * 0.0027 + seed) * 0.008,
-    });
-    const p = {} as Skeleton;
-    for (const j of JOINTS) p[j] = wobble(j, JOINTS.indexOf(j) * 1.7);
-    this.pose = { p, hip: { x: this.aspect * 0.5, y: 0.655 }, torso: 0.175, ok: true, seen: 1 };
-  }
 }

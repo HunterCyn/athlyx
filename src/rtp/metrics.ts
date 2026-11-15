@@ -173,23 +173,39 @@ export function symmetryIndex(m: TrialMetrics): number {
   return Math.round(valgus * 10) / 10;
 }
 
-export function verdict(index: number): { label: string; tone: 'good' | 'watch' | 'flag'; body: string } {
-  if (index >= 90) {
+/**
+ * Criteria status, using the bands the protocol defines: meets target criteria
+ * at or above 90 %, a borderline band from 85 % up to 90 %, and below target
+ * under 85 %. Fewer than three valid landings is insufficient data, whatever
+ * the number says. Fixed rules only — never a model.
+ */
+export function verdict(
+  index: number,
+  trials = 3,
+): { label: string; tone: 'good' | 'watch' | 'flag'; body: string } {
+  if (trials < 3) {
     return {
-      label: 'SYMMETRIC',
-      tone: 'good',
-      body: 'Both knees landed within 10% of each other. That is the range clinicians look for before progressive loading.',
+      label: 'INSUFFICIENT DATA',
+      tone: 'watch',
+      body: 'Fewer than three valid landings, so this set is not scored. A trial only counts when both legs are tracked and the landing is held.',
     };
   }
-  if (index >= 80) {
+  if (index >= 90) {
     return {
-      label: 'WATCH',
+      label: 'MEETS TARGET CRITERIA',
+      tone: 'good',
+      body: 'Both knees landed within 10% of each other, which is the band clinicians look for before progressive loading. This is one test, not a clearance.',
+    };
+  }
+  if (index >= 85) {
+    return {
+      label: 'BORDERLINE',
       tone: 'watch',
-      body: 'A visible side-to-side difference. Worth retesting after a warm-up, and worth showing a physio if it repeats.',
+      body: 'A small side-to-side difference, close enough to the noise of a single camera that it could go either way. Retest after a warm-up before reading anything into it.',
     };
   }
   return {
-    label: 'ASYMMETRIC',
+    label: 'BELOW TARGET CRITERIA',
     tone: 'flag',
     body: 'One knee is collapsing markedly more than the other. Do not progress impact work on this until a clinician has seen it.',
   };
