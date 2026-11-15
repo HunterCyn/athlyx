@@ -2,7 +2,8 @@
 
 One app, one page, one point: measure how a recovering athlete lands.
 
-- `/` and `/rtp` → **ATHLYX**, the landing screen. `src/rtp/`, entry `src/rtp/main.tsx`. Both `index.html` and `rtp.html` mount it so old `/rtp` links keep working.
+- `/` → the public **landing page**. `src/landing/`, entry `src/landing/main.tsx`, `index.html`.
+- `/rtp` → the **check-in app**. `src/rtp/`, entry `src/rtp/main.tsx`, `rtp.html`. Every CTA on the landing page links here.
 - `site/worker.js` → serves `dist/` and hosts `POST /api/summary`, the only route that talks to Gemini.
 
 The yoga coach and the pose arcade that this project grew out of have been removed. Do not reintroduce them.
