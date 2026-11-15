@@ -420,6 +420,71 @@ function Trial(props: {
   );
 }
 
+/* ------------------------------ save to record ---------------------------- */
+
+/** Signed-in athletes can keep the numbers. Without an account nothing leaves the tab. */
+function SaveRecord(props: { index: number; status: string; agg: TrialMetrics; trials: TrialMetrics[] }) {
+  const [state, setState] = useState<'checking' | 'guest' | 'ready' | 'saving' | 'saved' | 'error'>('checking');
+
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/auth/me', { credentials: 'same-origin' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (alive) setState(d?.user?.role === 'athlete' ? 'ready' : 'guest');
+      })
+      .catch(() => {
+        if (alive) setState('guest');
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const save = async () => {
+    setState('saving');
+    try {
+      const res = await fetch('/api/checkins', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          index: props.index,
+          status: props.status,
+          trials: props.trials.length,
+          left: props.agg.leftValgus,
+          right: props.agg.rightValgus,
+          trunk: props.agg.trunk,
+          pelvic: props.agg.pelvic,
+          kneeSep: props.agg.kneeSep,
+        }),
+      });
+      setState(res.ok ? 'saved' : 'error');
+    } catch {
+      setState('error');
+    }
+  };
+
+  if (state === 'checking' || state === 'guest') return null;
+
+  return (
+    <div className="r-ai">
+      <div className="r-kicker">YOUR RECORD</div>
+      {state === 'saved' ? (
+        <p className="r-body">Saved. Your physiotherapist can see it on their patient list.</p>
+      ) : (
+        <>
+          <p className="r-body">Keep this result in your history so it appears as a trend for your clinician.</p>
+          <button className="r-btn ghost" onClick={save} disabled={state === 'saving'}>
+            {state === 'saving' ? 'SAVING…' : 'SAVE TO MY RECORD'}
+          </button>
+          {state === 'error' ? <p className="r-body">Couldn’t save — the result is still on this screen.</p> : null}
+        </>
+      )}
+    </div>
+  );
+}
+
 /* ------------------------------- coach read ------------------------------- */
 
 /** One paragraph from the measured numbers. The key stays on the server; this
@@ -608,6 +673,8 @@ function Report(props: {
             ))}
           </div>
         </div>
+
+        <SaveRecord index={index} status={v.label} agg={agg} trials={trials} />
 
         <AiRead
           index={index}

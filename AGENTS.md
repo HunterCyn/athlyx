@@ -3,8 +3,9 @@
 One app, one page, one point: measure how a recovering athlete lands.
 
 - `/` → the public **landing page**. `src/landing/`, entry `src/landing/main.tsx`, `index.html`.
-- `/rtp` → the **check-in app**. `src/rtp/`, entry `src/rtp/main.tsx`, `rtp.html`. Every CTA on the landing page links here.
-- `site/worker.js` → serves `dist/` and hosts `POST /api/summary`, the only route that talks to Gemini.
+- `/app` → **accounts**: sign-in/sign-up for athletes and physiotherapists, then role-specific dashboards. `src/app/`, entry `src/app/main.tsx`, `app.html`. The landing CTAs point here.
+- `/rtp` → the **check-in app**. `src/rtp/`, entry `src/rtp/main.tsx`, `rtp.html`. Signed-in athletes can save a result to their record from the report.
+- `site/worker.js` → serves `dist/`, the whole `/api` (auth, links, assignments, check-ins, exercises, plans) on D1, and `POST /api/summary`, the only route that talks to Gemini.
 
 The yoga coach and the pose arcade that this project grew out of have been removed. Do not reintroduce them.
 
@@ -20,6 +21,15 @@ The yoga coach and the pose arcade that this project grew out of have been remov
 - `src/rtp/Athlete.ts` — synthetic drop landing with a **planted** valgus angle per leg; demo body and test rig in one.
 - `src/rtp/RtpApp.tsx` — gate → setup → three trials → report, plus the `AiRead` card.
 - `src/rtp/overlay.ts` — skeleton drawing. Must map through **object-fit: cover**, or the skeleton drifts off the body.
+
+## Accounts and data
+
+- D1 binding `DB`; tables are created lazily on first request in `ensureSchema`, which also seeds the six-exercise library and one linked demo pair (`athlete@athlyx.demo` / `therapist@athlyx.demo`, password `athlyx-demo`).
+- Passwords: PBKDF2-SHA256, per-user salt, **100 000 iterations — Workers rejects more**, which showed up as a 500 on every route because the demo seed hashes a password during schema setup.
+- Sessions: random token in an HttpOnly `ax_s` cookie, stored in `sessions`, 30 days.
+- Authorisation is checked per route: a therapist may only touch an athlete they are in `links` with (otherwise 403), and every `/api` route except health/signup/login needs a session (otherwise 401). Do not trust an `athleteId` from the body without that check.
+- Check-ins store numbers only. Never store frames, clips or landmark dumps.
+- Errors return a generic `server_error`; stack traces go to `console.log('api_error', …)` only.
 
 ## Rules that have already bitten
 

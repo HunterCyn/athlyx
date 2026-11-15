@@ -18,8 +18,9 @@ export default function Landing() {
           </div>
           <nav className="lx-nav">
             <a href="#how">How it works</a>
-            <a className="lx-btn lx-btn--mint" href="/rtp">
-              Start the check-in
+            <a href="/app">Sign in</a>
+            <a className="lx-btn lx-btn--mint" href="/app?mode=signup">
+              Create account
             </a>
           </nav>
         </div>
@@ -36,15 +37,16 @@ export default function Landing() {
               paragraph of plain English from Gemini. No wearables, no force plates, no stored video.
             </p>
             <div className="lx-actions">
-              <a className="lx-btn lx-btn--mint" href="/rtp">
-                Start the check-in
+              <a className="lx-btn lx-btn--mint" href="/app?mode=signup">
+                Create account
               </a>
-              <a className="lx-btn lx-btn--ghost" href="#how">
-                See how it works
+              <a className="lx-btn lx-btn--ghost" href="/app">
+                Sign in
               </a>
             </div>
             <p className="lx-note">
-              No account, no install. No camera on this machine? Use the demo athlete on the next screen.
+              Demo accounts: <b>athlete@athlyx.demo</b> or <b>therapist@athlyx.demo</b>, password{' '}
+              <b>athlyx-demo</b>.
             </p>
           </div>
         </section>

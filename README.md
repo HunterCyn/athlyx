@@ -29,6 +29,24 @@ Requires Node 20+. The pose model is bundled in `public/`, so `npm run dev` work
 
 **4. Report.** Per-leg knee angle, knee separation, trunk lean, pelvic drop, the symmetry score against the 90 % reference, a trend across sessions, the pipeline self-test, and a printable layout.
 
+## Accounts
+
+`/app` is the account page. Two roles sign in at the same place:
+
+- **Athletes** run the check-in, see the next date their physiotherapist set, work through the plan that was sent to them, tick exercises off, and keep a history of saved scores.
+- **Physiotherapists** link an athlete with the six-character code from the athlete's home screen, set how often the next check-in should happen and leave a note, build a plan from the shared exercise library (or add their own exercise), and read the saved check-ins — score, both knee angles, status and date.
+
+Demo accounts, already linked and holding two check-ins and a three-exercise plan:
+
+```
+athlete@athlyx.demo      athlyx-demo
+therapist@athlyx.demo    athlyx-demo
+```
+
+Passwords are PBKDF2-SHA256 with a per-user salt; sessions are an HttpOnly cookie, stored server-side, good for thirty days. Everything lives in D1 (`users`, `links`, `assignments`, `checkins`, `exercises`, `plans`, `plan_items`) behind `/api`. A physiotherapist can only read an athlete they are linked to.
+
+A saved check-in sends **numbers only** — score, per-leg knee angle, trunk lean, pelvic drop, knee separation, status and trial count. Video never leaves the browser, with or without an account.
+
 ## Scoring
 
 | Band | Rule |
@@ -76,12 +94,14 @@ The report can turn the numbers into one plain-language paragraph. The browser p
 ```
 src/rtp/metrics.ts    geometry, landing detection, symmetry, criteria status
 src/rtp/Athlete.ts    synthetic landing + the planted-angle self-test
-src/rtp/RtpApp.tsx    gate → setup → trials → report
+src/rtp/RtpApp.tsx    gate → setup → trials → report, plus save-to-record
 src/rtp/overlay.ts    skeleton overlay (object-fit: cover mapping)
 src/rtp/store.ts      sessions in localStorage (rtp.v1)
 src/lib/vision.ts     MediaPipe Pose Landmarker (GPU → CPU fallback)
 src/lib/body.ts       33 landmarks → torso-normalised body
-site/worker.js        static assets + the Gemini route
+src/landing/          the public landing page
+src/app/              accounts: sign-in, athlete home, physiotherapist home
+site/worker.js        static assets, auth + plans + check-ins API, Gemini route
 ```
 
 ## Status
